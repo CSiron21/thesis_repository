@@ -134,7 +134,7 @@ async function fetchTheses() {
     if (f.panelist) params.set('panelist', f.panelist);
 
     try {
-        const res = await fetch(`${API}?${params}`);
+        const res = await fetch(`${API}?${params}`, { credentials: 'same-origin' });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Failed to load');
         renderGrid(json.data);
@@ -148,7 +148,7 @@ async function fetchTheses() {
 }
 
 async function fetchThesis(id) {
-    const res = await fetch(`${API}?id=${id}`);
+    const res = await fetch(`${API}?id=${id}`, { credentials: 'same-origin' });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Not found');
     return json.data;
@@ -156,7 +156,7 @@ async function fetchThesis(id) {
 
 async function loadFilterOptions() {
     try {
-        const res = await fetch(`${API}?action=filters`);
+        const res = await fetch(`${API}?action=filters`, { credentials: 'same-origin' });
         const json = await res.json();
         const select = $('#adviserFilter');
         select.innerHTML = '<option value="">All Advisers</option>';
@@ -394,7 +394,7 @@ async function handleFormSubmit(e) {
 
     try {
         const url = id ? `${API}?action=update` : API;
-        const res = await fetch(url, { method: 'POST', body: formData, headers: csrfHeaders() });
+        const res = await fetch(url, { method: 'POST', body: formData, headers: csrfHeaders(), credentials: 'same-origin' });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Save failed');
         closeAllModals();
@@ -490,7 +490,7 @@ function openDeleteModal(id) {
 
 async function doDelete(id) {
     try {
-        const res = await fetch(`${API}?id=${id}`, { method: 'DELETE', headers: csrfHeaders() });
+        const res = await fetch(`${API}?id=${id}`, { method: 'DELETE', headers: csrfHeaders(), credentials: 'same-origin' });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Delete failed');
         closeAllModals();
@@ -529,7 +529,7 @@ function handleRemoveImage() {
 async function backupDatabase() {
     showToast('Preparing backup…', 'info');
     try {
-        const res = await fetch('api/backup.php?action=backup');
+        const res = await fetch('api/backup.php?action=backup', { credentials: 'same-origin' });
         if (!res.ok) {
             const json = await res.json().catch(() => ({}));
             throw new Error(json.error || 'Backup failed');
@@ -568,7 +568,7 @@ async function restoreDatabase() {
     formData.append('backup_file', file);
 
     try {
-        const res = await fetch('api/backup.php?action=restore', { method: 'POST', body: formData, headers: csrfHeaders() });
+        const res = await fetch('api/backup.php?action=restore', { method: 'POST', body: formData, headers: csrfHeaders(), credentials: 'same-origin' });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Restore failed');
         showToast('Database restored successfully', 'success');

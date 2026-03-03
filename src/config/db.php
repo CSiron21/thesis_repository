@@ -12,10 +12,22 @@ function csrfToken(): string {
 }
 
 function validateCsrf(): void {
-    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $_POST['_csrf'] ?? '';
+    $headerToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    $postToken = $_POST['_csrf'] ?? '';
+    $token = trim($headerToken ?: $postToken);
     if (!hash_equals($_SESSION['csrf_token'], $token)) {
         http_response_code(403);
-        echo json_encode(['success' => false, 'error' => 'Invalid or missing CSRF token']);
+        echo json_encode([
+            'success' => false, 
+            'error' => 'Invalid or missing CSRF token',
+            'debug' => [
+                'session_token_len' => strlen($_SESSION['csrf_token']),
+                'provided_token_len' => strlen($token),
+                'session_token_start' => substr($_SESSION['csrf_token'], 0, 5),
+                'provided_token_start' => substr($token, 0, 5),
+                'header_token' => $headerToken
+            ]
+        ]);
         exit;
     }
 }
